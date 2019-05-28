@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,9 +11,23 @@ import (
 
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
+	"go.mercari.io/datastore"
+	"go.mercari.io/datastore/clouddatastore"
 )
 
+var DS datastore.Client
+
 func main() {
+	ctx := context.Background()
+
+	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
+	ds, err := clouddatastore.FromContext(ctx, datastore.WithProjectID(projectID))
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(1)
+	}
+	DS = ds
+
 	ucon.Orthodox()
 	ucon.Middleware(swagger.RequestValidator())
 
@@ -32,6 +47,8 @@ func main() {
 		},
 	})
 	ucon.Plugin(swPlugin)
+
+	SetupOrganizationAPI(swPlugin)
 
 	ucon.DefaultMux.Prepare()
 	http.Handle("/api/", ucon.DefaultMux)
