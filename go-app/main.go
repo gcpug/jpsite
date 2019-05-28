@@ -5,10 +5,37 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
+	"strings"
+
+	"github.com/favclip/ucon"
+	"github.com/favclip/ucon/swagger"
 )
 
 func main() {
-	http.HandleFunc("/", indexHandler)
+	ucon.Orthodox()
+	ucon.Middleware(swagger.RequestValidator())
+
+	swPlugin := swagger.NewPlugin(&swagger.Options{
+		Object: &swagger.Object{
+			Info: &swagger.Info{
+				Title:   "GCPUG",
+				Version: "v4",
+			},
+			Schemes: []string{"http", "https"},
+		},
+		DefinitionNameModifier: func(refT reflect.Type, defName string) string {
+			if strings.HasSuffix(defName, "JSON") {
+				return defName[:len(defName)-4]
+			}
+			return defName
+		},
+	})
+	ucon.Plugin(swPlugin)
+
+	ucon.DefaultMux.Prepare()
+	http.Handle("/api/", ucon.DefaultMux)
+	http.HandleFunc("/", StaticContentsHandler)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -18,12 +45,4 @@ func main() {
 
 	log.Printf("Listening on port %s", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
-}
-
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	fmt.Fprint(w, "Hello, World!")
 }
