@@ -88,7 +88,7 @@ func TestOrganizationStore_ListAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e, g := 10, len(l); e != g {
+	if e, g := 1, len(l); e != g {
 		t.Fatalf("expected list.len = %v, got %v", e, g)
 	}
 	fmt.Printf("key is %+v\n", l[0].Key)
