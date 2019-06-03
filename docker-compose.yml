@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+
+  app:
+    image: golang:1.11.5-stretch
+    command: go test -v ./...
+    container_name: app
+    depends_on:
+      - datastore
+    environment:
+      - GO111MODULE=on
+      - DATASTORE_EMULATOR_HOST=datastore:8432
+  datastore:
+    image: gcr.io/cloud-builders/gcloud
+    command: gcloud beta emulators datastore start --host-port=0.0.0.0:8432 --no-store-on-disk --consistency=1.0
+    ports:
+      - "8432:8432"
+networks:
+  default:
+    external:
+      name: cloudbuild
