@@ -18,16 +18,36 @@ import (
 var DS datastore.Client
 
 func main() {
+	Initialize()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+		log.Printf("Defaulting to port %s", port)
+	}
+
+	log.Printf("Listening on port %s", port)
+	ucon.ListenAndServe(fmt.Sprintf(":%s", port))
+}
+
+func Initialize() {
 	ctx := context.Background()
 
+	SetUpDatastore(ctx)
+	SetUpUcon()
+}
+
+func SetUpDatastore(ctx context.Context) {
 	projectID := os.Getenv("GOOGLE_CLOUD_PROJECT")
 	ds, err := clouddatastore.FromContext(ctx, datastore.WithProjectID(projectID))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("required ENV GOOGLE_CLOUD_PROJECT:", err)
 		os.Exit(1)
 	}
 	DS = ds
+}
 
+func SetUpUcon() {
 	ucon.Orthodox()
 	ucon.Middleware(swagger.RequestValidator())
 
@@ -53,13 +73,4 @@ func main() {
 	ucon.DefaultMux.Prepare()
 	http.Handle("/api/", ucon.DefaultMux)
 	http.HandleFunc("/", StaticContentsHandler)
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
-
-	log.Printf("Listening on port %s", port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/favclip/ucon"
 	"github.com/favclip/ucon/swagger"
-	"net/http"
 )
 
 func SetupOrganizationAPI(swPlugin *swagger.Plugin) {
