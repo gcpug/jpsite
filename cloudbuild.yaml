@@ -1,0 +1,16 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ['run', '-d', '--network=cloudbuild', '--name=cds-emulator', 'google/cloud-sdk:248.0.0', 'gcloud', 'beta', 'emulators', 'datastore', 'start', '--host-port=0.0.0.0:8081']
+  - name: jwilder/dockerize:0.6.1
+    args: ['dockerize', '-timeout=60s', '-wait=tcp://cds-emulator:8081']
+  - name: 'golang:1.11.5-stretch'
+    entrypoint: 'go'
+    args: ['test', '-v', './...']
+    env:
+      - 'GO111MODULE=on'
+      - 'DATASTORE_EMULATOR_HOST=cds-emulator:8081'
+      - 'GOOGLE_CLOUD_PROJECT=unittest'
+  # for cloud-build-local
+  - name: gcr.io/cloud-builders/docker
+    args: ['rm', '--force', 'cds-emulator']
+
