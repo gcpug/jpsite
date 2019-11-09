@@ -9,8 +9,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	Initialize()
-
 	status := m.Run()
 
 	os.Exit(status)
