@@ -13,4 +13,12 @@ steps:
   # for cloud-build-local
   - name: gcr.io/cloud-builders/docker
     args: ['rm', '--force', 'cds-emulator']
-
+  # angular build
+  - name: node:12.13
+    entrypoint: 'npm'
+    args: ['ci']
+    dir: 'ng-app'
+  - name: node:12.13
+    entrypoint: 'npm'
+    args: ['run', 'prod']
+    dir: 'ng-app'
