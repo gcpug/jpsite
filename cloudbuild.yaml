@@ -18,13 +18,13 @@ steps:
     id: npm-ci
     entrypoint: 'npm'
     args: ['ci']
-    dir: 'ng-app'
+    dir: 'frontend'
     waitFor: ['-']
   - name: node:12.13
     id: npm-run
     entrypoint: 'npm'
-    args: ['run', 'prod']
-    dir: 'ng-app'
+    args: ['run', 'build:prod']
+    dir: 'frontend'
     waitFor: ['npm-ci']
   # deploy
   - name: 'gcr.io/cloud-builders/gcloud'
