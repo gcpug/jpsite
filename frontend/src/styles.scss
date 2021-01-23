@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+
+@import 'styles/material';
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+p { text-indent: 1em; }
+
+@import 'styles/header';
+
+@import 'styles/top';
+
+@import 'styles/footer';

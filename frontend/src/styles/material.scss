@@ -1,0 +1,28 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import '~@angular/material/theming';
+
+$font-setting: mat-typography-config(
+  $font-family: '"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Hiragino Sans",Meiryo,sans-serif'
+);
+@include mat-core($font-setting);
+
+$base-typography: mat-typography-config(
+  $headline: mat-typography-level(48px, 64px, 700),
+  $body-1: mat-typography-level(16px, 24px, 500)
+);
+@include mat-base-typography($base-typography);
+
+$frontend-primary: mat-palette($mat-blue);
+$frontend-accent: mat-palette($mat-orange, A200, A100, A400);
+$frontend-warn: mat-palette($mat-red);
+
+$frontend-theme: mat-light-theme((
+  color: (
+    primary: $frontend-primary,
+    accent: $frontend-accent,
+    warn: $frontend-warn,
+  )
+));
+@include angular-material-theme($frontend-theme);
