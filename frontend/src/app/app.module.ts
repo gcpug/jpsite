@@ -12,7 +12,7 @@ import { FooterComponent } from './footer/footer.component';
 @NgModule({
   declarations: [AppComponent, NavComponent, TopComponent, FooterComponent],
   imports: [
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule
