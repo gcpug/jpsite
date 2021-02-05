@@ -127,6 +127,9 @@
               "@nestjs/microservices/microservices-module",
               "@nestjs/websockets",
               "@nestjs/websockets/socket-module",
+              "@nestjs/platform-express",
+              "class-transformer",
+              "class-validator",
               "cache-manager"
             ]
           },
@@ -162,9 +165,7 @@
           "options": {
             "browserTarget": "frontend:build:production",
             "serverTarget": "frontend:server:production",
-            "routes": [
-              "/"
-            ]
+            "routes": ["/"]
           },
           "configurations": {
             "production": {}
