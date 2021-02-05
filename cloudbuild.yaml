@@ -1,39 +1,60 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
-    id: cds-emulator
-    args: ['run', '-d', '--network=cloudbuild', '--name=cds-emulator', 'google/cloud-sdk:248.0.0', 'gcloud', 'beta', 'emulators', 'datastore', 'start', '--host-port=0.0.0.0:8081']
-  - name: jwilder/dockerize:0.6.1
-    args: ['dockerize', '-timeout=60s', '-wait=tcp://cds-emulator:8081']
-  - name: 'golang:1.13-stretch'
-    id: go-test
-    entrypoint: 'go'
-    args: ['test', '-v', './...']
-    env:
-      - 'GO111MODULE=on'
-      - 'DATASTORE_EMULATOR_HOST=cds-emulator:8081'
-      - 'GOOGLE_CLOUD_PROJECT=unittest'
-    waitFor: ['cds-emulator']
-  # angular build
-  - name: node:12.13
-    id: npm-ci
+  - name: node:12.21-slim
+    id: npm-install
     entrypoint: 'npm'
-    args: ['ci']
-    dir: 'frontend'
-    waitFor: ['-']
-  - name: node:12.13
-    id: npm-run
-    entrypoint: 'npm'
-    args: ['run', 'build:prod']
-    dir: 'frontend'
-    waitFor: ['npm-ci']
-  # deploy
-  - name: 'gcr.io/cloud-builders/gcloud'
     args:
-      - 'app'
-      - 'deploy'
+      - ci
+    dir: frontend
     waitFor:
-      - 'go-test'
-      - 'npm-run'
-  # for cloud-build-local
-  - name: gcr.io/cloud-builders/docker
-    args: ['rm', '--force', 'cds-emulator']
+      - '-'
+
+  # Angular unit test
+  - name: node:12.13
+    id: angular-test
+    entrypoint: 'npm'
+    args:
+      - run
+      - test
+    dir: frontend
+    waitFor:
+      - npm-install
+
+  # Angular + nestjs build
+  - name: node:12.21-slim
+    id: angular-with-nest-build
+    entrypoint: 'npm'
+    args:
+      - run
+      - build:ssr
+    dir: frontend
+    waitFor:
+      - npm-install
+
+  # build Docker image with cache
+  - name: 'gcr.io/kaniko-project/executor:v1.3.0'
+    id: kaniko
+    args:
+      - --destination=asia-northeast1-docker.pkg.dev/$PROJECT_ID/jpsite/$BRANCH_NAME:$COMMIT_SHA
+      - --cache=true
+      - --cache-ttl=6h
+    waitFor:
+      - angular-test
+      - angular-with-nest-build
+
+  # deploy Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:319.0.0'
+    entrypoint: 'gcloud'
+    args:
+      - run
+      - deploy
+      - jpsite
+      - --region=asia-northeast1
+      - --platform=managed
+      - --service-account=jpsite-run@$PROJECT_ID.iam.gserviceaccount.com
+      - --max-instances=1
+      - --cpu=1
+      - --memory=256M
+      - --concurrency=8
+      - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/jpsite/$BRANCH_NAME:$COMMIT_SHA
+    waitFor:
+      - kaniko
