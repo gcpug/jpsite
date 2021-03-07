@@ -58,3 +58,5 @@ steps:
       - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/frontend/$BRANCH_NAME:$COMMIT_SHA
     waitFor:
       - kaniko
+
+timeout: 900s
