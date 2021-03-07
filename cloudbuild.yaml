@@ -34,7 +34,7 @@ steps:
   - name: 'gcr.io/kaniko-project/executor:v1.3.0'
     id: kaniko
     args:
-      - --destination=asia-northeast1-docker.pkg.dev/$PROJECT_ID/jpsite/$BRANCH_NAME:$COMMIT_SHA
+      - --destination=asia-northeast1-docker.pkg.dev/$PROJECT_ID/frontend/$BRANCH_NAME:$COMMIT_SHA
       - --cache=true
       - --cache-ttl=6h
     waitFor:
@@ -55,6 +55,6 @@ steps:
       - --cpu=1
       - --memory=256M
       - --concurrency=8
-      - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/jpsite/$BRANCH_NAME:$COMMIT_SHA
+      - --image=asia-northeast1-docker.pkg.dev/$PROJECT_ID/frontend/$BRANCH_NAME:$COMMIT_SHA
     waitFor:
       - kaniko
