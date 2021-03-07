@@ -9,7 +9,7 @@ steps:
       - '-'
 
   # Angular unit test
-  - name: node:12.13
+  - name: asia-northeast1-docker.pkg.dev/$PROJECT_ID/frontend/ng-test-runner
     id: angular-test
     entrypoint: 'npm'
     args:
