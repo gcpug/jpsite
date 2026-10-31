@@ -1,12 +1,9 @@
 
-@import 'styles/material';
+@use 'styles/material';
+@use 'styles/header';
+@use 'styles/top';
+@use 'styles/footer';
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 p { text-indent: 1em; }
-
-@import 'styles/header';
-
-@import 'styles/top';
-
-@import 'styles/footer';
